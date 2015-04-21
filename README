@@ -1,1 +1,12 @@
+This a JSON version of Reuters 21578 corpus
+
+Reuters 21578 README
+
+http://kdd.ics.uci.edu/databases/reuters21578/README.txt
+
+R8 - The set of the 8 classes with the highest number of positive training examples,  all the documents with less than or with more than one topic were eliminated,  the topics that  have at least one train and one test example.
+
+
+http://web.ist.utl.pt/~acardoso/datasets/
+
 http://www.daviddlewis.com/resources/testcollections/reuters21578/

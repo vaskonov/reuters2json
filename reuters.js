@@ -26,8 +26,6 @@ async.eachSeries(files, function(file, callback1){
 	async.eachSeries(reuters, function(reuter, callback2){ 
 
 		var parser = new xml2js.Parser();
-
-		
 		
 	// _.each(reuters, function(reuter, key, list){ 
 		reuter =reuter + "</REUTERS>"
@@ -35,18 +33,18 @@ async.eachSeries(files, function(file, callback1){
 		setTimeout(function() { 
 
 			parser.parseString(reuter, function (err, result) {
-
-				console.log(reuter)
 	    	
-	        	result['REUTERS']['DATE'] = result['REUTERS']['DATE'][0]
-	        	result['REUTERS']['UNKNOWN'] = result['REUTERS']['UNKNOWN'][0]
+	        	if ('DATE' in result['REUTERS'])
+	        		result['REUTERS']['DATE'] = result['REUTERS']['DATE'][0]
+	        	
+	        	if ('UNKNOWN' in result['REUTERS'])
+	        		result['REUTERS']['UNKNOWN'] = result['REUTERS']['UNKNOWN'][0]
 
 	        	_.each(arrs, function(arr, key, list){ 
 	        		if (_.isObject(result['REUTERS'][arr][0]))
 	        			if ('D' in result['REUTERS'][arr][0])
 	        				result['REUTERS'][arr] = result['REUTERS'][arr][0]['D']
 	        	}, this)
-
 				
 				result['REUTERS']['TEXT'] = result['REUTERS']['TEXT'][0]
 
