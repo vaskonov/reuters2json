@@ -3,8 +3,8 @@ var xml2js = require('xml2js');
 var _ = require('underscore')._;
 var async = require('async')
 
-// var path = "./reuters21578"
-var path = "./test"
+var path = "./reuters21578"
+// var path = "./test"
 var dataset = []
 
 var files = fs.readdirSync(path)
@@ -51,6 +51,46 @@ function ModApte_split(dataset)
 	return data
 }
 
+function calcDist(dataset, topics)
+{
+	var dist = {'train': {}, 'test':{}}
+
+	_.each(topics, function(topic, key, list){ 
+		_.each(['train', 'test'], function(mode, key, list){ 
+			_.each(dataset[mode], function(value, key, list){ 
+				if (value['TOPICS'][0] == topic)
+					{
+						if (!(topic in dist[mode]))
+							dist[mode][topic] = 0
+
+						dist[mode][topic] = dist[mode][topic] + 1
+					}
+			}, this)
+		}, this)
+	}, this)
+	
+	return dist
+}
+
+function atLeastOne(dataset, topics)
+{
+
+	var keep_topics = []
+	_.each(topics, function(topic, key, list){ 
+		
+		var train_ex = _.find(dataset['train'], function(num){ return num['TOPICS'][0] == topic });
+		var test_ex = _.find(dataset['test'], function(num){ return num['TOPICS'][0] == topic });
+
+		if (!_.isUndefined(train_ex) && !_.isUndefined(test_ex))
+			keep_topics.push(topic)
+	}, this)
+	return keep_topics
+}
+
+function filterSingle(dataset)
+{
+	return _.filter(dataset, function(num){ return (num['TOPICS'].length == 1 && num['TOPICS'][0] != "") });
+}
 
 // _.each(files, function(file, key, list){ 
 // _.each(['copy.sgm'], function(file, key, list){ 
@@ -98,15 +138,25 @@ async.eachSeries(files, function(file, callback1){
 	}, function(err){callback1()})
 }, function(err){
 
-	var data = ModApte_split(dataset)
-
 	// console.log(data['train'].length)
 	// console.log(data['test'].length)
 	// console.log(data['unused'].length)
 
 	// console.log(JSON.stringify(dataset, null, 4))	
-	var logs = countTopics(dataset, 10)
-	console.log(logs)
+	var topics = countTopics(dataset, 10)
+
+	data = filterSingle(dataset)
+
+	var data = ModApte_split(data)
+
+	var keep_topics  = atLeastOne(data, topics)
+
+	var dist = calcDist(data, keep_topics)
+
+	console.log(topics)
+	console.log(keep_topics)
+	console.log(dist)
+
 	process.exit(0)
 })
 
