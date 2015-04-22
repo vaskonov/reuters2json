@@ -5,6 +5,7 @@ var async = require('async')
 
 var path = "./reuters21578"
 // var path = "./test"
+
 var dataset = []
 
 var files = fs.readdirSync(path)
@@ -85,9 +86,10 @@ function formatText(text)
 			process.exit(0)
 		}
 
+	// text = text.replace(/\\u0003/g, '')
 	text = text.replace(/\n/g, ' ')
-	text = text.replace(/\\u0003/g, '')
 	text = text.replace(/\s{2,}/g, ' ')
+
 	return text
 }
 
