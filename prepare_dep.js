@@ -22,3 +22,6 @@ _.each(dataset, function(value, key, list){
 }, this)
 
 fs.writeFileSync('./full/full.json.dep/list', files.join("\n"))
+
+
+// java -cp stanford-corenlp-3.5.2.jar edu.stanford.nlp.pipeline.StanfordCoreNLP -props config.properties -filelist path  -outputFormat json

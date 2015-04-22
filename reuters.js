@@ -79,6 +79,7 @@ function calcDist(dataset, topics)
 function formatText(text)
 {
 	text = _.unescape(text)
+	
 
 	if (!_.isString(text))
 		{
@@ -86,9 +87,15 @@ function formatText(text)
 			process.exit(0)
 		}
 
-	// text = text.replace(/\\u0003/g, '')
+	
+
 	text = text.replace(/\n/g, ' ')
 	text = text.replace(/\s{2,}/g, ' ')
+
+	text = JSON.stringify(text, null, 4)
+	text = text.replace(/[rR][eE][uU][tT][eE][rR]\s*\\u0003/g, '')
+
+	text = JSON.parse(text)
 
 	return text
 }
@@ -113,77 +120,84 @@ function filterSingle(dataset)
 	return _.filter(dataset, function(num){ return (num['TOPICS'].length == 1 && num['TOPICS'][0] != "") });
 }
 
-// _.each(files, function(file, key, list){ 
-// _.each(['copy.sgm'], function(file, key, list){ 
-// async.eachSeries(['copy.sgm'], function(file, callback1){ 
-async.eachSeries(files, function(file, callback1){ 
-	var data = fs.readFileSync(path + "/" + file,'UTF-8')
-	reuters = data.split("</REUTERS>")	
-	reuters.splice(-1,1)
+if (process.argv[1] === __filename)
+{
 
-	async.eachSeries(reuters, function(reuter, callback2){ 
+	if (process.argv[2] == "full")
+	{
 
-		var parser = new xml2js.Parser();
-		
-	// _.each(reuters, function(reuter, key, list){ 
-		reuter =reuter + "</REUTERS>"
+		async.eachSeries(files, function(file, callback1){ 
+			var data = fs.readFileSync(path + "/" + file,'UTF-8')
+			reuters = data.split("</REUTERS>")	
+			reuters.splice(-1,1)
 
-		setTimeout(function() { 
+			async.eachSeries(reuters, function(reuter, callback2){ 
 
-			parser.parseString(reuter, function (err, result) {
-	    	
-	        	if ('DATE' in result['REUTERS'])
-	        		result['REUTERS']['DATE'] = result['REUTERS']['DATE'][0]
-	        	
-	        	if ('UNKNOWN' in result['REUTERS'])
-	        		result['REUTERS']['UNKNOWN'] = result['REUTERS']['UNKNOWN'][0]
-
-	        	_.each(arrs, function(arr, key, list){ 
-	        		if (_.isObject(result['REUTERS'][arr][0]))
-	        			if ('D' in result['REUTERS'][arr][0])
-	        				result['REUTERS'][arr] = result['REUTERS'][arr][0]['D']
-	        	}, this)
+				var parser = new xml2js.Parser();
 				
-				result['REUTERS']['TEXT'] = result['REUTERS']['TEXT'][0]
+			// _.each(reuters, function(reuter, key, list){ 
+				reuter =reuter + "</REUTERS>"
 
-				_.each(texs, function(tex, key, list){ 
-					if (tex in result['REUTERS']['TEXT'])
-						result['REUTERS']['TEXT'][tex] = result['REUTERS']['TEXT'][tex][0]		
-				}, this)
+				setTimeout(function() { 
 
-				if ('BODY' in result['REUTERS']['TEXT'])
-					result['REUTERS']['TEXT']['BODY'] = formatText(result['REUTERS']['TEXT']['BODY'])
+					parser.parseString(reuter, function (err, result) {
+			    	
+			        	if ('DATE' in result['REUTERS'])
+			        		result['REUTERS']['DATE'] = result['REUTERS']['DATE'][0]
+			        	
+			        	if ('UNKNOWN' in result['REUTERS'])
+			        		result['REUTERS']['UNKNOWN'] = result['REUTERS']['UNKNOWN'][0]
 
-				
-				result = result['REUTERS']
-	        	dataset.push(result)
-	        	callback2()
-	    	});
-    	}, 1)
-	}, function(err){callback1()})
-}, function(err){
+			        	_.each(arrs, function(arr, key, list){ 
+			        		if (_.isObject(result['REUTERS'][arr][0]))
+			        			if ('D' in result['REUTERS'][arr][0])
+			        				result['REUTERS'][arr] = result['REUTERS'][arr][0]['D']
+			        	}, this)
+						
+						result['REUTERS']['TEXT'] = result['REUTERS']['TEXT'][0]
 
-	fs.writeFileSync("./full/full.json", JSON.stringify(dataset, null, 4))
+						_.each(texs, function(tex, key, list){ 
+							if (tex in result['REUTERS']['TEXT'])
+								result['REUTERS']['TEXT'][tex] = result['REUTERS']['TEXT'][tex][0]		
+						}, this)
 
-	var slpitted = ModApte_split(data)
+						if ('BODY' in result['REUTERS']['TEXT'])
+							result['REUTERS']['TEXT']['BODY'] = formatText(result['REUTERS']['TEXT']['BODY'])
 
-	fs.writeFileSync("./full/full.test.json", JSON.stringify(slpitted['test'], null, 4))	
-	fs.writeFileSync("./full/full.train.json", JSON.stringify(slpitted['train'], null, 4))	
+						
+						result = result['REUTERS']
+			        	dataset.push(result)
+			        	callback2()
+			    	});
+		    	}, 1)
+			}, function(err){callback1()})
+		}, function(err){
 
-	var topics = countTopics(dataset, 10)
+			fs.writeFileSync("./full/full.json", JSON.stringify(dataset, null, 4))
 
-	data = filterSingle(dataset)
+			var slpitted = ModApte_split(data)
 
-	var data = ModApte_split(data)
+			fs.writeFileSync("./full/full.test.json", JSON.stringify(slpitted['test'], null, 4))	
+			fs.writeFileSync("./full/full.train.json", JSON.stringify(slpitted['train'], null, 4))	
 
-	var keep_topics  = atLeastOne(data, topics)
+			var topics = countTopics(dataset, 10)
 
-	var dist = calcDist(data, keep_topics)
+			data = filterSingle(dataset)
 
-	fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
-	fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
+			var data = ModApte_split(data)
 
-})
+			var keep_topics  = atLeastOne(data, topics)
+
+			var dist = calcDist(data, keep_topics)
+
+			fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
+			fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
+
+		})
+	}
+	
+
+}
 
 
 
