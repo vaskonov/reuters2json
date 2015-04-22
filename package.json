@@ -1,0 +1,27 @@
+{
+  "name": "reuters2json",
+  "version": "1.0.0",
+  "description": "This a JSON version of Reuters 21578 corpus",
+  "main": "reuters.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vaskonov/reuters2json.git"
+  },
+  "dependencies": {
+    "async": "*",
+    "underscore": "*",
+    "xml2js": "*"
+  },
+  "author": "vaskonov@yahoo.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vaskonov/reuters2json/issues"
+  },
+  "homepage": "https://github.com/vaskonov/reuters2json"
+}

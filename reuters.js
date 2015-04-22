@@ -72,6 +72,25 @@ function calcDist(dataset, topics)
 	return dist
 }
 
+// 1. replace all newlines with space
+// 2. replace the long sequences of spaces with one space
+
+function formatText(text)
+{
+	text = _.unescape(text)
+
+	if (!_.isString(text))
+		{
+			console.log(text + " it's not a string")
+			process.exit(0)
+		}
+
+	text = text.replace(/\n/g, ' ')
+	text = text.replace(/\\u0003/g, '')
+	text = text.replace(/\s{2,}/g, ' ')
+	return text
+}
+
 function atLeastOne(dataset, topics)
 {
 
@@ -129,6 +148,10 @@ async.eachSeries(files, function(file, callback1){
 					if (tex in result['REUTERS']['TEXT'])
 						result['REUTERS']['TEXT'][tex] = result['REUTERS']['TEXT'][tex][0]		
 				}, this)
+
+				if ('BODY' in result['REUTERS']['TEXT'])
+					result['REUTERS']['TEXT']['BODY'] = formatText(result['REUTERS']['TEXT']['BODY'])
+
 				
 				result = result['REUTERS']
 	        	dataset.push(result)
@@ -138,11 +161,13 @@ async.eachSeries(files, function(file, callback1){
 	}, function(err){callback1()})
 }, function(err){
 
-	// console.log(data['train'].length)
-	// console.log(data['test'].length)
-	// console.log(data['unused'].length)
+	fs.writeFileSync("./full/full.json", JSON.stringify(dataset, null, 4))
 
-	// console.log(JSON.stringify(dataset, null, 4))	
+	var slpitted = ModApte_split(data)
+
+	fs.writeFileSync("./full/full.test.json", JSON.stringify(slpitted['test'], null, 4))	
+	fs.writeFileSync("./full/full.train.json", JSON.stringify(slpitted['train'], null, 4))	
+
 	var topics = countTopics(dataset, 10)
 
 	data = filterSingle(dataset)
@@ -153,11 +178,9 @@ async.eachSeries(files, function(file, callback1){
 
 	var dist = calcDist(data, keep_topics)
 
-	console.log(topics)
-	console.log(keep_topics)
-	console.log(dist)
+	fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
+	fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
 
-	process.exit(0)
 })
 
 
