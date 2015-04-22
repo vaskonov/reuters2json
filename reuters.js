@@ -126,6 +126,8 @@ if (process.argv[1] === __filename)
 	if (process.argv[2] == "full")
 	{
 
+		console.log("creating full collection ...")
+
 		async.eachSeries(files, function(file, callback1){ 
 			var data = fs.readFileSync(path + "/" + file,'UTF-8')
 			reuters = data.split("</REUTERS>")	
@@ -180,13 +182,14 @@ if (process.argv[1] === __filename)
 			fs.writeFileSync("./full/full.test.json", JSON.stringify(slpitted['test'], null, 4))	
 			fs.writeFileSync("./full/full.train.json", JSON.stringify(slpitted['train'], null, 4))	
 
-			
+			console.log("full collection is created")
 
 		})
 	}
 
 	if (process.argv[2] == "R8")
 	{
+			console.log("creating R8 ...")
 
 			var dataset = JSON.parse(fs.readFileSync("./full/full.json", 'UTF-8'))
 
@@ -202,6 +205,8 @@ if (process.argv[1] === __filename)
 
 			fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
 			fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
+
+			console.log("R8 is created")
 	}	
 
 }
