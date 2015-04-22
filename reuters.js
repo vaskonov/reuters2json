@@ -79,7 +79,6 @@ function calcDist(dataset, topics)
 function formatText(text)
 {
 	text = _.unescape(text)
-	
 
 	if (!_.isString(text))
 		{
@@ -87,14 +86,13 @@ function formatText(text)
 			process.exit(0)
 		}
 
-	
-
 	text = text.replace(/\n/g, ' ')
 	text = text.replace(/\s{2,}/g, ' ')
 
 	text = JSON.stringify(text, null, 4)
 	text = text.replace(/[rR][eE][uU][tT][eE][rR]\s*\\u0003/g, '')
-
+	text = text.replace(/\\u0003/g, '')
+	text = text.replace(/\^M/g, '')
 	text = JSON.parse(text)
 
 	return text
@@ -166,7 +164,7 @@ if (process.argv[1] === __filename)
 						if ('BODY' in result['REUTERS']['TEXT'])
 							result['REUTERS']['TEXT']['BODY'] = formatText(result['REUTERS']['TEXT']['BODY'])
 
-						
+				
 						result = result['REUTERS']
 			        	dataset.push(result)
 			        	callback2()
