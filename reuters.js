@@ -180,6 +180,16 @@ if (process.argv[1] === __filename)
 			fs.writeFileSync("./full/full.test.json", JSON.stringify(slpitted['test'], null, 4))	
 			fs.writeFileSync("./full/full.train.json", JSON.stringify(slpitted['train'], null, 4))	
 
+			
+
+		})
+	}
+
+	if (process.argv[2] == "R8")
+	{
+
+			var dataset = JSON.parse(fs.readFileSync("./full/full.json", 'UTF-8'))
+
 			var topics = countTopics(dataset, 10)
 
 			data = filterSingle(dataset)
@@ -192,10 +202,7 @@ if (process.argv[1] === __filename)
 
 			fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
 			fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
-
-		})
-	}
-	
+	}	
 
 }
 
