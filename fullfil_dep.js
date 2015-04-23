@@ -53,6 +53,7 @@ _.each(dataset_hash, function(value, key, list){
 
 
 fs.writeFileSync('./full/full.json', JSON.stringify(dataset_new, null, 4))
+console.log("new data is added")
 
 
 
