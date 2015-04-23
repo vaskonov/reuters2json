@@ -187,24 +187,24 @@ if (process.argv[1] === __filename)
 
 	if (process.argv[2] == "R8")
 	{
-			console.log("creating R8 ...")
+		console.log("creating R8 ...")
 
-			var dataset = JSON.parse(fs.readFileSync("./full/full.json", 'UTF-8'))
+		var dataset = JSON.parse(fs.readFileSync("./full/full.json", 'UTF-8'))
 
-			var topics = countTopics(dataset, 10)
+		var topics = countTopics(dataset, 10)
 
-			data = filterSingle(dataset)
+		data = filterSingle(dataset)
 
-			var data = ModApte_split(data)
+		var data = ModApte_split(data)
 
-			var keep_topics  = atLeastOne(data, topics)
+		var keep_topics  = atLeastOne(data, topics)
 
-			var dist = calcDist(data, keep_topics)
+		var dist = calcDist(data, keep_topics)
 
-			fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
-			fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
+		fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
+		fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
 
-			console.log("R8 is created")
+		console.log("R8 is created")
 	}	
 
 }
