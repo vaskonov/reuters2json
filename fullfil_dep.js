@@ -33,7 +33,7 @@ _.each(dataset, function(value, key, list){
 _.each(files, function(file, key, list){ 
 
 	if (key % 1000 == 0)
-		console.log(key)
+		console.log(key + " from " + files.length)
 
 	if (file == "README")
 		return
@@ -57,7 +57,13 @@ var dataset_new = []
 
 console.log("Organaize hash in array")
 
+var len = Object.keys(dataset_hash).length
+
 _.each(dataset_hash, function(value, key, list){ 
+
+	if (key % 1000 == 0)
+		console.log(key + " from " + len)
+
 	if (!('body_dep' in value))
 	{
 		console.log(value['$']['NEWID']+" no body_dep")
