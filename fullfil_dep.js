@@ -15,6 +15,9 @@ _.each(dataset, function(value, key, list){
 
 _.each(files, function(file, key, list){ 
 
+	if (key % 1000 == 0)
+		console.log("One more 1000")
+
 	if (file == "README")
 		return
 
@@ -34,6 +37,8 @@ var dataset_new = []
 
 // body_dep
 // title_dep
+
+console.log("Organaize hash in array")
 
 _.each(dataset_hash, function(value, key, list){ 
 	if (!('body_dep' in value))
