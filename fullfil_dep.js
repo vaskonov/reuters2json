@@ -79,8 +79,10 @@ _.each(dataset_hash, function(value, key, list){
 	dataset_new.push(value)
 }, this)
 
-
-fs.writeFileSync('./full/full.json', JSON.stringify(dataset_new, null, 4))
+console.log("stringifing the dataset")
+var str = JSON.stringify(dataset_new, null, 4)
+console.log("writing file")
+fs.writeFileSync('./full/full.json', )
 console.log("new data is added")
 
 
