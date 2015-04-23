@@ -16,7 +16,7 @@ _.each(dataset, function(value, key, list){
 _.each(files, function(file, key, list){ 
 
 	if (key % 1000 == 0)
-		console.log("One more 1000")
+		console.log(key)
 
 	if (file == "README")
 		return
