@@ -52,21 +52,17 @@ function ModApte_split(dataset)
 	return data
 }
 
-function calcDist(dataset, topics)
+function calcDist(dataset)
 {
 	var dist = {'train': {}, 'test':{}}
 
-	_.each(topics, function(topic, key, list){ 
-		_.each(['train', 'test'], function(mode, key, list){ 
-			_.each(dataset[mode], function(value, key, list){ 
-				if (value['TOPICS'][0] == topic)
-					{
-						if (!(topic in dist[mode]))
-							dist[mode][topic] = 0
+	_.each(['train', 'test'], function(mode, key, list){ 
+		_.each(dataset[mode], function(value, key, list){ 
+			var topic = value['TOPICS'][0]
+				if (!(topic in dist[mode]))
+					dist[mode][topic] = 0
 
-						dist[mode][topic] = dist[mode][topic] + 1
-					}
-			}, this)
+				dist[mode][topic] = dist[mode][topic] + 1
 		}, this)
 	}, this)
 	
@@ -111,6 +107,22 @@ function atLeastOne(dataset, topics)
 			keep_topics.push(topic)
 	}, this)
 	return keep_topics
+}
+
+function filterTopics(dataset, topics)
+{
+
+	var split = ['test', 'train']
+
+	var dataset_new = {'train':[], 'test':[]}
+	
+	_.each(split, function(sp, key, list){ 
+		_.each(dataset[sp], function(value, key, list){ 
+			if (topics.indexOf(value['TOPICS'][0]) != -1)
+				dataset_new[sp].push(value)
+		}, this)
+	}, this)
+	return dataset_new
 }
 
 function filterSingle(dataset)
@@ -158,6 +170,7 @@ if (process.argv[1] === __filename)
 
 						_.each(texs, function(tex, key, list){ 
 							if (tex in result['REUTERS']['TEXT'])
+
 								result['REUTERS']['TEXT'][tex] = result['REUTERS']['TEXT'][tex][0]		
 						}, this)
 
@@ -199,10 +212,14 @@ if (process.argv[1] === __filename)
 
 		var keep_topics  = atLeastOne(data, topics)
 
-		var dist = calcDist(data, keep_topics)
+		var dataset_new = filterTopics(data, topics)
 
-		fs.writeFileSync("./R8/R8.test.json", JSON.stringify(data['test'], null, 4))
-		fs.writeFileSync("./R8/R8.train.json", JSON.stringify(data['train'], null, 4))
+		var dist = calcDist(dataset_new)
+
+		fs.writeFileSync("./R8/R8.test.json", JSON.stringify(dataset_new['test'], null, 4))
+		fs.writeFileSync("./R8/R8.train.json", JSON.stringify(dataset_new['train'], null, 4))
+
+		console.log(JSON.stringify(dist, null, 4))
 
 		console.log("R8 is created")
 	}	
