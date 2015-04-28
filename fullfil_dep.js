@@ -1,11 +1,11 @@
 var fs = require('fs');
 var _ = require('underscore')._;
 
-var dir = __dirname+'/full/full.json.parsed/'
+var dir = __dirname+'/full/full.json.parse/'
 
 var files = fs.readdirSync(dir)
 
-var dataset = JSON.parse(fs.readFileSync('./full/full.json','UTF-8'))
+var dataset = JSON.parse(fs.readFileSync('./R8/R8.test.json','UTF-8'))
 
 var dataset_hash = {}
 
@@ -20,7 +20,6 @@ function parse_filter(parse)
 	_.each(parse['sentences'], function(value, key, list){ 
 		delete parse['sentences'][key]['basic-dependencies']
 		delete parse['sentences'][key]['collapsed-dependencies']
-		delete parse['sentences'][key]['tokens']
 	}, this)
 
 	return parse
@@ -42,12 +41,10 @@ _.each(files, function(file, key, list){
 
 	var id = names[0].toString()
 
-	if (!(id in dataset_hash))
+	if (id in dataset_hash)
 	{
-		console.log("File Id is not in the hash")
-		process.exit(0)
+		dataset_hash[names[0]][names[1] + "_CORENLP" ] = parse_filter(JSON.parse(fs.readFileSync(dir + file,'UTF-8')))
 	}
-	dataset_hash[names[0]][names[1] + "_dep" ] = parse_filter(JSON.parse(fs.readFileSync(dir + file,'UTF-8')))
 }, this)
 
 var dataset_new = []
@@ -64,17 +61,17 @@ _.each(dataset_hash, function(value, key, list){
 	if (key % 1000 == 0)
 		console.log(key + " from " + len)
 
-	if (!('body_dep' in value))
-	{
-		console.log(value['$']['NEWID']+" no body_dep")
-		process.exit(0)
-	}
-
-	if (!('title_dep' in value))
-	{
-		console.log(value['$']['NEWID']+" no title_dep")
-		process.exit(0)
-	}
+	// if (!('body_dep' in value))
+	// {
+		// console.log(value['$']['NEWID']+" no body_dep")
+		// process.exit(0)
+	// }
+// 
+	// if (!('title_dep' in value))
+	// {
+		// console.log(value['$']['NEWID']+" no title_dep")
+		// process.exit(0)
+	// }
 
 	dataset_new.push(value)
 }, this)
@@ -82,7 +79,7 @@ _.each(dataset_hash, function(value, key, list){
 console.log("stringifing the dataset")
 var str = JSON.stringify(dataset_new, null, 4)
 console.log("writing file")
-fs.writeFileSync('./full/full.json', str)
+fs.writeFileSync('./R8/R8.test.corenlp.json', str)
 console.log("new data is added")
 
 
