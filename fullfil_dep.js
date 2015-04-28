@@ -5,7 +5,7 @@ var dir = __dirname+'/full/full.json.parse/'
 
 var files = fs.readdirSync(dir)
 
-var dataset = JSON.parse(fs.readFileSync('./R8/R8.test.json','UTF-8'))
+var dataset = JSON.parse(fs.readFileSync('./R8/R8.train.json','UTF-8'))
 
 var dataset_hash = {}
 
@@ -76,15 +76,13 @@ _.each(dataset_hash, function(value, key, list){
 	dataset_new.push(value)
 }, this)
 
+var data_splited = _.groupBy(dataset_new, function(element, index){
+	return index%15;
+})
 
-
-var dataset_new1 = dataset_new.slice(0,Math.floor(dataset_new.length/2))
-
-console.log("writing 1")
-fs.writeFileSync('./R8/R8.test1.corenlp.json', JSON.stringify(dataset_new1, null, 4))
-console.log("writing 2")
-fs.writeFileSync('./R8/R8.test2.corenlp.json', JSON.stringify(dataset_new, null, 4))
-console.log("new data is added")
-
+_.each(_.toArray(data_splited), function(data, key, list){
+	console.log("writing "+key)
+	fs.writeFileSync('./R8/train/R8.train.'+key+'.corenlp.json', JSON.stringify(data, null, 4))
+}, this)
 
 
