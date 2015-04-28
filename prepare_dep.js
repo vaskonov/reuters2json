@@ -6,18 +6,26 @@ var file = './full/full.json'
 var dataset = JSON.parse(fs.readFileSync(file,'UTF-8'))
 var files = []
 
+var types = ['body','title']
 
 _.each(dataset, function(value, key, list){ 
 
 	var id = value["$"]['NEWID']
-	var body = value['TEXT']['BODY']
-	var title = value['TEXT']['TITLE']
 
-	fs.writeFileSync('./full/full.json.dep/'+id+".title", title)
-	fs.writeFileSync('./full/full.json.dep/'+id+".body", body)
+	_.each(types, function(type, key, list){ 
+		if (type in value['TEXT'])
+		{
+			var data = value['TEXT'][type]
+			var data = data.replace(/\<\w*\.*\w*\>/g," ")
+			var data = data.replace(/\n/g," ")
+			var data = data.replace(/\s[uU]\.*[sS]\.*\s/g," USA ")
 
-	files.push(__dirname+'/full/full.json.dep/'+id+".body")
-	files.push(__dirname+'/full/full.json.dep/'+id+".title")
+			fs.writeFileSync('./full/full.json.dep/'+id+"."+"data", data)
+
+			files.push(__dirname+'/full/full.json.dep/'+id+"."+data)
+		}
+	}, this)
+	
 
 }, this)
 
