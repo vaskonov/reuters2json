@@ -76,10 +76,14 @@ _.each(dataset_hash, function(value, key, list){
 	dataset_new.push(value)
 }, this)
 
-console.log("stringifing the dataset")
-var str = JSON.stringify(dataset_new, null, 4)
-console.log("writing file")
-fs.writeFileSync('./R8/R8.test.corenlp.json', str)
+
+
+var dataset_new1 = dataset_new.slice(0,Math.floor(dataset_new.length/2))
+
+console.log("writing 1")
+fs.writeFileSync('./R8/R8.test1.corenlp.json', JSON.stringify(dataset_new1, null, 4))
+console.log("writing 2")
+fs.writeFileSync('./R8/R8.test2.corenlp.json', JSON.stringify(dataset_new, null, 4))
 console.log("new data is added")
 
 
