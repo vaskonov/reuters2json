@@ -13,23 +13,18 @@ var conversion = {
 	'PartOfSpeech':'pos',
 	'Text':'word',
 	'Lemma':'lemma',
-	'NamedEntityTag':'ner',
-	'NormalizedNamedEntityTag':'nner'
+	'NamedEntityTag':'ner'
 }
 
-function parseLine(line)
+function parseLine(input)
 {
 	var output = {}
-	line = line.replace(/[\[\]]/g,'')
+	line = input.replace(/[\[\]]/g,'')
 	line = line.split(" ")
 	_.each(line, function(param, key, list){ 
 		var pair = param.split("=")
-		if (!(pair[0] in conversion))
-			{
-			console.log(pair[0])
-			process.exit(0)
-			}
-		output[conversion[pair[0]]] = pair[1]
+		if (pair[0] in conversion)
+			output[conversion[pair[0]]] = pair[1]
 	}, this)
 	return output
 }
@@ -80,6 +75,9 @@ var types = ['BODY', 'TITLE']
 
 _.each(dataset, function(value, key, list){ 
 
+	if (key % 1000 == 0)
+		console.log(key + " within "+dataset.length)
+
 	var id = value['$']['NEWID']
 
 	_.each(types, function(type, key, list){ 
@@ -97,7 +95,9 @@ _.each(dataset, function(value, key, list){
 	}, this)
 }, this)
 
-fs.writeFileSync('./R8/train/R8.train.corenlp.json', JSON.stringify(dataset, null, 4))
+
+console.log('writing')
+fs.writeFileSync('./R8/test/R8.train.corenlp.json', JSON.stringify(dataset, null, 4))
 
 
 // var data_splited = _.groupBy(dataset_new, function(element, index){
