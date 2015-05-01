@@ -22,6 +22,8 @@ _.each(dataset, function(value, key, list){
 			data = data.replace(/\s[uU]\.*[sS]\.*\s/g," USA ")
 			data = data.replace(/\s{2,}/g, ' ')
 
+			if (type == 'TITLE')
+				data = data.toLowerCase()			
 
 			fs.writeFileSync('./full/full.json.dep/'+id+"."+type, data)
 

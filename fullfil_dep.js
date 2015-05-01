@@ -5,7 +5,7 @@ var dir = './full/full.json.parse/'
 
 var files = fs.readdirSync(dir)
 
-var dataset = JSON.parse(fs.readFileSync('./R8/R8.train.json','UTF-8'))
+var dataset = JSON.parse(fs.readFileSync('./R8/R8.test.json','UTF-8'))
 
 var conversion = {
 	'CharacterOffsetBegin':'characterOffsetBegin',
@@ -33,11 +33,11 @@ function parseLine(input)
 function replaceToken(json, id, type)
 {
 	var file = id + "." + type + ".out"
-	if (files.indexOf(file) == -1)
-	{
-		console.log("file " + file + " is not found in directory")
-		process.exit(0)
-	}
+//	if (files.indexOf(file) == -1)
+//	{
+//		console.log("file " + file + " is not found in directory")
+//		process.exit(0)
+//	}
 
 	var out = fs.readFileSync(dir + file,'UTF-8')
 
@@ -80,12 +80,11 @@ _.each(dataset, function(value, key, list){
 
 	var id = value['$']['NEWID']
 
-	_.each(types, function(type, key, list){ 
-		var file = id+"."+type+".json"
+	_.each(types, function(type, keyt, listt){ 
 		
-
-		if (files.indexOf(file) != -1)
+		if (type in value['TEXT'])
 		{
+			var file = id+"."+type+".json"
 			var json = parse_filter(JSON.parse(fs.readFileSync(dir + file,'UTF-8')))
 			json = replaceToken(json, id, type)
 
@@ -97,16 +96,16 @@ _.each(dataset, function(value, key, list){
 
 
 console.log('writing')
-fs.writeFileSync('./R8/test/R8.train.corenlp.json', JSON.stringify(dataset, null, 4))
+//fs.writeFileSync('./R8/test/R8.train.corenlp.json', JSON.stringify(dataset, null, 4))
 
 
-// var data_splited = _.groupBy(dataset_new, function(element, index){
-// 	return index%15;
-// })
+ var data_splited = _.groupBy(dataset, function(element, index){
+ 	return index%5;
+ })
 
-// _.each(_.toArray(data_splited), function(data, key, list){
-// 	console.log("writing "+key)
-// 	fs.writeFileSync('./R8/train/R8.train.'+key+'.corenlp.json', JSON.stringify(data, null, 4))
-// }, this)
+ _.each(_.toArray(data_splited), function(data, key, list){
+ 	console.log("writing "+key)
+ 	fs.writeFileSync('./R8/test/R8.test.'+key+'.corenlp.json', JSON.stringify(data, null, 4))
+ }, this)
 
 
