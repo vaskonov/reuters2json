@@ -5,7 +5,7 @@ var dir = './full/full.json.parse/'
 
 var files = fs.readdirSync(dir)
 
-var dataset = JSON.parse(fs.readFileSync('./R8/R8.test.json','UTF-8'))
+var dataset = JSON.parse(fs.readFileSync('./R8/R8.train.json','UTF-8'))
 
 var conversion = {
 	'CharacterOffsetBegin':'characterOffsetBegin',
@@ -63,11 +63,73 @@ function replaceToken(json, id, type)
 function parse_filter(parse)
 {
 	_.each(parse['sentences'], function(value, key, list){ 
-		delete parse['sentences'][key]['basic-dependencies']
+		// delete parse['sentences'][key]['basic-dependencies']
 		delete parse['sentences'][key]['collapsed-dependencies']
+		delete parse['sentences'][key]['collapsed-ccprocessed-dependencies']
 	}, this)
 
 	return parse
+}
+
+function collapse(input)
+{
+
+	_.each(input['sentences'], function(sen, keys, list){
+		
+		input['sentences'][keys]['collapsed-dependencies'] = JSON.parse(JSON.stringify(sen['basic-dependencies']))
+		
+		var buffer = {}
+		// buffer['IN'] = 'going'
+		_.each(sen['collapsed-dependencies'], function(value, keyd, list){ 
+
+			if (value['dep'] == 'prep')
+				{
+				if (!(value['dependent'] in buffer))
+						buffer[value['dependent']] = {}
+
+					buffer[value['dependent']]['governor'] = value['governor']
+					buffer[value['dependent']]['prep_dependent'] = value['dependentGloss']
+					buffer[value['dependent']]['governor_record'] = keyd
+					buffer[value['dependent']]['governorGloss'] = value['governorGloss']
+				}
+
+			if (value['dep'] == 'pobj')
+				{
+					if (!(value['governor'] in buffer))
+						buffer[value['governor']] = {}
+
+					buffer[value['governor']]['dependent'] = value['dependent']
+					buffer[value['governor']]['dependentGloss'] = value['dependentGloss']
+					buffer[value['governor']]['prep_governor'] = value['governorGloss']
+					buffer[value['governor']]['dependent_record'] = keyd
+				}
+		 }, this)
+
+		var tail = []
+		_.each(buffer, function(value, key, list){ 
+		 	if (('governor' in value) && ('dependent' in value))
+				{
+		 		input['sentences'][keys]['collapsed-dependencies'].splice(value['governor_record'], 1, undefined)
+		 		input['sentences'][keys]['collapsed-dependencies'].splice(value['dependent_record'], 1, undefined)
+		 		if (value['prep_dependent'] != value['prep_governor'])
+					throw new Error("for some reason preps are not equal");
+
+		 		tail.push({
+		 			'dep': "prep:" + value['prep_dependent'].toLowerCase(),
+		 			'governor': value['governor'],
+		 			'dependent': value['dependent'],
+		 			'governorGloss': value['governorGloss'],
+		 			'dependentGloss': value['dependentGloss']
+		 		})
+		  		}
+		}, this)
+
+		input['sentences'][keys]['collapsed-dependencies'] = _.compact(input['sentences'][keys]['collapsed-dependencies'])
+		input['sentences'][keys]['collapsed-dependencies'] = input['sentences'][keys]['collapsed-dependencies'].concat(tail) 
+	
+	}, this)
+
+	return input
 }
 
 var types = ['BODY', 'TITLE']
@@ -82,18 +144,27 @@ _.each(dataset, function(value, key, list){
 
 	_.each(types, function(type, keyt, listt){ 
 		
-		if (type in value['TEXT'])
-		{
-			var file = id+"."+type+".json"
-			var json = parse_filter(JSON.parse(fs.readFileSync(dir + file,'UTF-8')))
-			json = replaceToken(json, id, type)
+		var file = id+"."+type+".json"
 
-			dataset[key][type + "_CORENLP" ] = json	
+		if (files.indexOf(file) != -1)
+		{
+		
+			if (type in value['TEXT'])
+			{
+				var json = parse_filter(JSON.parse(fs.readFileSync(dir + file,'UTF-8')))
+				json = replaceToken(json, id, type)
+				json = collapse(json)
+
+				dataset[key][type + "_CORENLP" ] = json	
+
+				console.log(JSON.stringify(dataset[key], null, 4))
+				console.log()
+				process.exit(0)
+			}
 		}
 
 	}, this)
 }, this)
-
 
 console.log('writing')
 //fs.writeFileSync('./R8/test/R8.train.corenlp.json', JSON.stringify(dataset, null, 4))
